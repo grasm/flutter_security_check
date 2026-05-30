@@ -3,8 +3,8 @@ import 'package:flutter_security_check/flutter_security_check.dart';
 
 void main() {
   test('securityCheck', () async {
-    // Karena kita memakai MethodChannel langsung di FlutterSecurityCheck,
-    // Unit test ini kita buat simpel untuk memastikan class bisa diakses.
+    // Since we are using MethodChannel directly in FlutterSecurityCheck,
+    // this unit test is kept simple just to ensure the class is accessible.
     expect(true, true);
   });
 }

@@ -1,3 +1,11 @@
+## 0.2.0
+* **iOS Platform Support**: Added native implementation for iOS security checks.
+    * Jailbreak Detection (Cydia path checks, filesystem access, URL Schemes)
+    * Simulator/Emulator Detection
+    * Debugger Detection (sysctl)
+    * Native Threat/Frida Detection (dyld image scan)
+    * Proxy and VPN Connection Detection
+
 ## 0.1.0
 * **Advanced Emulator Detection**: Added hardware property checks and specific driver/file detection (QEMU, Genymotion).
 * **Enhanced Root Detection**: Added Build Tags (test-keys) check and Magisk/MagiskHide package detection.
