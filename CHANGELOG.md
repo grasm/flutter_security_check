@@ -1,3 +1,6 @@
+## 0.2.1
+* **Swift Package Manager (SPM) Support**: Added `Package.swift` to support modern iOS/macOS integration.
+
 ## 0.2.0
 * **iOS Platform Support**: Added native implementation for iOS security checks.
     * Jailbreak Detection (Cydia path checks, filesystem access, URL Schemes)
