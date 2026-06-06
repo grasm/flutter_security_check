@@ -22,6 +22,6 @@ void main() {
     
     // Pastikan fungsi mengembalikan nilai (tidak crash)
     expect(details.containsKey('isRooted'), true);
-    expect(isSecure is bool, true);
+    expect(isSecure, isA<bool>());
   });
 }
