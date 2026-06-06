@@ -167,7 +167,7 @@ class _SecurityDashboardState extends State<SecurityDashboard> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: (_isSecure ? Colors.green : Colors.red).withOpacity(0.3),
+            color: (_isSecure ? Colors.green : Colors.red).withAlpha((255 * 0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           )
@@ -213,7 +213,7 @@ class _SecurityDashboardState extends State<SecurityDashboard> {
         color: const Color(0xFF1E293B),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isSafe ? Colors.green.withOpacity(0.3) : Colors.red.withOpacity(0.3),
+          color: isSafe ? Colors.green.withAlpha((255 * 0.3) : Colors.red.withAlpha((255 * 0.3),
           width: 1,
         ),
       ),

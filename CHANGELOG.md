@@ -1,3 +1,7 @@
+## 0.3.1
+* **Fix**: Resolved Dart analyzer warnings (`withOpacity` deprecation) in the example app and integration tests.
+* **CI/CD**: Improved GitHub Actions workflow to suppress non-fatal info logs and updated Node.js actions version.
+
 ## 0.3.0
 * **Play Integrity API (Android)**: Added `requestPlayIntegrityToken(nonce)` for backend validation.
 * **App Clone Detection (Android)**: Detects if the app is running in parallel space, dual app, or cloned environments.
