@@ -1,3 +1,7 @@
+## 0.3.2
+* **Fix**: Restructured iOS Swift source files to fully support both Swift Package Manager (SPM) and CocoaPods seamlessly.
+* **CI/CD**: Configured GitHub Actions to use the latest Flutter stable channel to resolve Dart SDK version constraint issues.
+
 ## 0.3.1
 * **Fix**: Resolved Dart analyzer warnings (`withOpacity` deprecation) in the example app and integration tests.
 * **CI/CD**: Improved GitHub Actions workflow to suppress non-fatal info logs and updated Node.js actions version.

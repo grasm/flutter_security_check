@@ -16,7 +16,7 @@ let package = Package(
         .target(
             name: "flutter_security_check",
             dependencies: [],
-            path: "../../Classes",
+            path: "Sources/flutter_security_check",
             resources: []
         )
     ]
