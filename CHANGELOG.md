@@ -1,3 +1,12 @@
+## 0.3.0
+* **Play Integrity API (Android)**: Added `requestPlayIntegrityToken(nonce)` for backend validation.
+* **App Clone Detection (Android)**: Detects if the app is running in parallel space, dual app, or cloned environments.
+* **Screen Capture Prevention**: Added `preventScreenCapture(bool)` method to block screenshots and screen recordings (implements `FLAG_SECURE` for Android and `UITextField` secure entry trick for iOS).
+* **Android Mock Location Detection**: Added detection for Mock Location (GPS Spoofing).
+* **Android Accessibility Detection**: Added detection for active Accessibility Services (often abused by overlay malware).
+* **Enhanced iOS App Integrity**: Added detection for App Store vs TestFlight/AdHoc installer sources.
+* **Advanced iOS Dylib Detection**: Expanded native hooking detection to cover MobileSubstrate, CydiaSubstrate, and SSLKillSwitch.
+
 ## 0.2.1
 * **Swift Package Manager (SPM) Support**: Added `Package.swift` to support modern iOS/macOS integration.
 

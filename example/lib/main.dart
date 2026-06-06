@@ -34,6 +34,8 @@ class _SecurityDashboardState extends State<SecurityDashboard> {
   Map<String, dynamic> _details = {};
   bool _isSecure = true;
   bool _isLoading = true;
+  bool _preventScreenCapture = false;
+  String _playToken = "";
 
   @override
   void initState() {
@@ -105,11 +107,39 @@ class _SecurityDashboardState extends State<SecurityDashboard> {
                       _buildSecurityCard("VPN Active", _details['isVpnActive'] ?? false, Icons.vpn_lock, isInverse: true),
                       _buildSecurityCard("Proxy", _details['isProxyEnabled'] ?? false, Icons.settings_ethernet, isInverse: true),
                       _buildSecurityCard("Dev Mode", _details['isDevelopmentMode'] ?? false, Icons.developer_mode, isInverse: true),
+                      _buildSecurityCard("Mock GPS", _details['isMockLocation'] ?? false, Icons.location_off, isInverse: true),
+                      _buildSecurityCard("Cloned App", _details['isAppClone'] ?? false, Icons.control_point_duplicate, isInverse: true),
+                      _buildSecurityCard("Overlay/A11y", _details['isAccessibilityEnabled'] ?? false, Icons.accessibility, isInverse: true),
                     ],
                   ),
                   const SizedBox(height: 24),
                   _buildInfoTile("App Signature Hash", _details['appSignature']?.toString() ?? "N/A"),
                   _buildInfoTile("Installer Source", _details['installerPackage']?.toString() ?? "N/A"),
+                  
+                  const SizedBox(height: 24),
+                  const Text("Action Controls", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 16),
+                  
+                  SwitchListTile(
+                    title: const Text("Prevent Screen Capture"),
+                    subtitle: const Text("Blocks screenshots & screen recording"),
+                    value: _preventScreenCapture,
+                    onChanged: (val) async {
+                      await FlutterSecurityCheck.preventScreenCapture(val);
+                      setState(() { _preventScreenCapture = val; });
+                    },
+                  ),
+                  
+                  ListTile(
+                    title: const Text("Request Play Integrity Token"),
+                    subtitle: Text(_playToken.isEmpty ? "Tap to request token from Google Play" : _playToken),
+                    trailing: const Icon(Icons.security_update_good),
+                    onTap: () async {
+                      setState(() => _playToken = "Requesting...");
+                      String? token = await FlutterSecurityCheck.requestPlayIntegrityToken("example_nonce_123");
+                      setState(() => _playToken = token ?? "Failed to get token");
+                    },
+                  ),
                 ],
               ),
             ),

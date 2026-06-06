@@ -1,6 +1,6 @@
 name: flutter_security_check
-description: "A comprehensive Flutter security plugin for Android and iOS. Detects Root/Jailbreak, Emulator, Frida, Proxy, VPN, and App Integrity threats using multi-layered checks."
-version: 0.2.1
+description: "A comprehensive Flutter security plugin for Android and iOS. Detects Root/Jailbreak, Emulator, Frida, Cloned Apps, Mock Location, VPN, and blocks Screen Capture."
+version: 0.3.0
 homepage: https://github.com/grasm/flutter_security_check
 repository: https://github.com/grasm/flutter_security_check
 issue_tracker: https://github.com/grasm/flutter_security_check/issues

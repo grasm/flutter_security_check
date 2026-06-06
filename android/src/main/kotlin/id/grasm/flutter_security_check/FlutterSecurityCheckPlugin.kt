@@ -7,11 +7,18 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import androidx.annotation.Keep
 import java.io.File
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
+import com.google.android.play.core.integrity.IntegrityManagerFactory
+import com.google.android.play.core.integrity.IntegrityTokenRequest
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
+import android.app.Activity
+import android.view.WindowManager
 
 @Keep
-class FlutterSecurityCheckPlugin: FlutterPlugin, MethodCallHandler {
+class FlutterSecurityCheckPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     private lateinit var channel : MethodChannel
     private var context: android.content.Context? = null
+    private var activity: Activity? = null
 
     companion object {
         init {
@@ -43,6 +50,44 @@ class FlutterSecurityCheckPlugin: FlutterPlugin, MethodCallHandler {
                 
                 result.success(!(isRooted || isDebugger || isEmulator || isNativeThreat))
             }
+
+            "preventScreenCapture" -> {
+                val prevent = call.argument<Boolean>("prevent") ?: false
+                activity?.let {
+                    it.runOnUiThread {
+                        if (prevent) {
+                            it.window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                        } else {
+                            it.window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                        }
+                    }
+                }
+                result.success(null)
+            }
+            "requestPlayIntegrityToken" -> {
+                val nonce = call.argument<String>("nonce")
+                if (nonce == null) {
+                    result.error("INVALID_ARGUMENT", "Nonce is required", null)
+                    return
+                }
+                context?.let { ctx ->
+                    try {
+                        val integrityManager = IntegrityManagerFactory.create(ctx)
+                        val request = IntegrityTokenRequest.builder()
+                            .setNonce(nonce)
+                            .build()
+                        integrityManager.requestIntegrityToken(request)
+                            .addOnSuccessListener { response ->
+                                result.success(response.token())
+                            }
+                            .addOnFailureListener { e ->
+                                result.error("PLAY_INTEGRITY_ERROR", e.message, null)
+                            }
+                    } catch (e: Exception) {
+                        result.error("PLAY_INTEGRITY_EXCEPTION", e.message, null)
+                    }
+                } ?: result.error("NO_CONTEXT", "Application context is null", null)
+            }
             "getSecurityDetails" -> {
                 val isNativeThreat = try { checkNativeSecurity() } catch (e: UnsatisfiedLinkError) { false }
                 result.success(mapOf(
@@ -55,7 +100,10 @@ class FlutterSecurityCheckPlugin: FlutterPlugin, MethodCallHandler {
                     "installerPackage" to getInstallerPackageName(),
                     "isProxyEnabled" to checkProxy(),
                     "isVpnActive" to checkVPN(),
-                    "isXposedDetected" to checkXposed()
+                    "isXposedDetected" to checkXposed(),
+                    "isMockLocation" to checkMockLocation(),
+                    "isAccessibilityEnabled" to checkAccessibilityService(),
+                    "isAppClone" to checkAppClone()
                 ))
             }
             else -> result.notImplemented()
@@ -220,6 +268,76 @@ class FlutterSecurityCheckPlugin: FlutterPlugin, MethodCallHandler {
             }
         }
         return false
+    }
+
+
+    private fun checkMockLocation(): Boolean {
+        return context?.let { ctx ->
+            var isMock = false
+            try {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                    val appOpsManager = ctx.getSystemService(android.content.Context.APP_OPS_SERVICE) as android.app.AppOpsManager
+                    isMock = (appOpsManager.checkOpNoThrow(
+                        android.app.AppOpsManager.OPSTR_MOCK_LOCATION,
+                        android.os.Process.myUid(),
+                        ctx.packageName
+                    ) == android.app.AppOpsManager.MODE_ALLOWED)
+                } else {
+                    @Suppress("DEPRECATION")
+                    isMock = android.provider.Settings.Secure.getString(ctx.contentResolver, android.provider.Settings.Secure.ALLOW_MOCK_LOCATION) != "0"
+                }
+            } catch (e: Exception) {}
+            isMock
+        } ?: false
+    }
+
+    private fun checkAccessibilityService(): Boolean {
+        return context?.let { ctx ->
+            var isEnabled = false
+            try {
+                val am = ctx.getSystemService(android.content.Context.ACCESSIBILITY_SERVICE) as android.view.accessibility.AccessibilityManager
+                isEnabled = am.isEnabled && am.getEnabledAccessibilityServiceList(android.accessibilityservice.AccessibilityServiceInfo.FEEDBACK_ALL_MASK).isNotEmpty()
+            } catch (e: Exception) {}
+            isEnabled
+        } ?: false
+    }
+
+
+    private fun checkAppClone(): Boolean {
+        return context?.let { ctx ->
+            try {
+                val dataDir = ctx.applicationInfo.dataDir
+                if (dataDir.contains("/999/") || dataDir.contains("/10/") || dataDir.contains("/11/")) {
+                    return true
+                }
+                val cloneApps = arrayOf("com.lbe.parallel", "com.excelliance.duala", "com.qihoo.magic", "com.applisto.appcloner")
+                for (cloneApp in cloneApps) {
+                    try {
+                        ctx.packageManager.getPackageInfo(cloneApp, 0)
+                        return true
+                    } catch (e: Exception) {}
+                }
+                false
+            } catch (e: Exception) {
+                false
+            }
+        } ?: false
+    }
+
+    override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        activity = binding.activity
+    }
+
+    override fun onDetachedFromActivityForConfigChanges() {
+        activity = null
+    }
+
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+        activity = binding.activity
+    }
+
+    override fun onDetachedFromActivity() {
+        activity = null
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
