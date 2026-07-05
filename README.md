@@ -19,8 +19,7 @@ Add the plugin to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_security_check:
-    path: ./plugins/flutter_security_check
+  flutter_security_check: ^0.3.3
 ```
 
 ## Usage

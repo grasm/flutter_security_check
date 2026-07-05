@@ -1,3 +1,6 @@
+## 0.3.3
+* **Fix**: Relaxed Dart SDK constraints to `>=3.0.0 <4.0.0` to resolve `version solving failed` errors for developers using older stable versions of Flutter.
+
 ## 0.3.2
 * **Fix**: Restructured iOS Swift source files to fully support both Swift Package Manager (SPM) and CocoaPods seamlessly.
 * **CI/CD**: Configured GitHub Actions to use the latest Flutter stable channel to resolve Dart SDK version constraint issues.
